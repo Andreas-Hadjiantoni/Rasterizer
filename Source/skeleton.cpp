@@ -143,7 +143,7 @@ void interpolate( ivec2 a, ivec2 b, vector<ivec2>& result ) {
   // slope is positive
   bool mPos = y1 > y0;
 
-  int steps = result.size();//xMain ? abs( dx ) : abs( dy );
+  int steps = result.size();
   int change = mPos ? 1 : -1;
 
   int d = xMain ? (2 * change * dy - dx) : (2 * dx - change * dy);
@@ -171,26 +171,14 @@ void interpolate( ivec2 a, ivec2 b, vector<ivec2>& result ) {
   }
 }
 
-void interpolate1Dfloat( float a, float b, vector<float>& result ) {
+template<typename T>
+void interpolate( T a, T b, vector<T>& result ) {
   int N = result.size();
-  float step = ( b - a ) / (float)max( N - 1, 1 );
-  float current = a;
-  for (int i = 0; i < N; i++ ) {
-    result[i] = current;
-    current += step;
-  }
-}
+  T step = T( ( b - a ) ) / float( max( N - 1, 1 ) );
+  T current = a;
 
-void interpolate( vec4 a, vec4 b, vector<vec4>& result ) {
-  a = a / a.z;
-  b = b / b.z;
-
-  int N = result.size();
-  vec4 step = vec4( b - a ) / float( max( N - 1, 1 ) );
-  vec4 current( a );
   for ( int i = 0; i < N; i++ ) {
     result[i] = current;
-    result[i] = result[i] / result[i].w;
     current += step;
   }
 }
@@ -206,7 +194,7 @@ void interpolate( pixel a, pixel b, vector<pixel>& result ) {
 
   interpolate( a_, b_, Pixels );
   interpolate( a.pos3d, b.pos3d, _3dPositions );
-  interpolate1Dfloat( a.zinv, b.zinv, Depths );
+  interpolate( a.zinv, b.zinv, Depths );
 
   for ( size_t i = 0; i < N; i++ ) {
     result[i].x = Pixels[i].x;
@@ -215,6 +203,7 @@ void interpolate( pixel a, pixel b, vector<pixel>& result ) {
     result[i].pos3d = _3dPositions[i];
   }
 }
+
 // </interpolation functions>
 
 mat4 getHomogenisationMatrix() {
